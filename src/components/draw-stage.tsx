@@ -36,13 +36,13 @@ import { parseParticipants } from '@/lib/csv';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type ConnectionStatus = 'connecting' | 'online' | 'offline';
-type ModalType        = 'login' | 'manage' | 'history' | null;
+type ModalType = 'login' | 'manage' | 'history' | null;
 
 /** คำสั่งสุ่มที่ยังรอยืนยัน (idempotency key) */
 type Intent = {
   requestId: string;
-  prizeId:   string;
-  count:     number;
+  prizeId: string;
+  count: number;
 };
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
@@ -57,10 +57,10 @@ class ApiFailure extends Error {
 /** POST ไปยัง /api/draw/:action และโยน ApiFailure ถ้าไม่สำเร็จ */
 async function post(action: string, body: unknown) {
   const response = await fetch(`/api/draw/${action}`, {
-    method:  'POST',
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(body),
-    signal:  AbortSignal.timeout(15_000),
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15_000),
   });
   const data = await response.json();
   if (!response.ok) throw new ApiFailure(response.status, data.error || 'ทำรายการไม่สำเร็จ');
@@ -76,9 +76,9 @@ const getMessage = (e: unknown): string =>
 /** ไอคอนประจำประเภทรางวัล */
 function PrizeIcon({ kind, size = 22 }: { kind: string; size?: number }) {
   const Icon = kind === 'audio' ? Headphones
-             : kind === 'watch' ? Watch
-             : kind === 'bag'   ? Backpack
-             : Gift;
+    : kind === 'watch' ? Watch
+      : kind === 'bag' ? Backpack
+        : Gift;
   return <Icon size={size} strokeWidth={1.6} />;
 }
 
@@ -111,21 +111,21 @@ function ProductArt({ prize }: { prize: Prize | undefined }) {
             <stop stopColor="#303536" />
             <stop offset=".35" stopColor="#686f6d" />
             <stop offset=".65" stopColor="#252b2c" />
-            <stop offset="1"   stopColor="#626967" />
+            <stop offset="1" stopColor="#626967" />
           </linearGradient>
           <linearGradient id="ear" x1="0" y1="0" x2="1" y2="1">
             <stop stopColor="#777b73" />
             <stop offset=".45" stopColor="#363b37" />
-            <stop offset="1"   stopColor="#171e1b" />
+            <stop offset="1" stopColor="#171e1b" />
           </linearGradient>
         </defs>
         <ellipse cx="193" cy="296" rx="106" ry="12" fill="#31251c" opacity=".1" />
         <g transform="rotate(-13 190 170)">
           <path d="M87 213v-54a103 103 0 0 1 206 0v54" fill="none" stroke="#202726" strokeWidth="33" />
-          <path d="M91 181v-23a99 99 0 0 1 198 0v23"  fill="none" stroke="url(#band)" strokeWidth="22" />
-          <path d="M87 158a103 103 0 0 1 206 0"        fill="none" stroke="#939a93" strokeWidth="3" opacity=".7" />
-          <path d="M89 172v49M291 172v49"              stroke="#adb3a9" strokeWidth="12" />
-          <rect x="62"  y="186" width="62" height="96" rx="28" fill="url(#ear)" />
+          <path d="M91 181v-23a99 99 0 0 1 198 0v23" fill="none" stroke="url(#band)" strokeWidth="22" />
+          <path d="M87 158a103 103 0 0 1 206 0" fill="none" stroke="#939a93" strokeWidth="3" opacity=".7" />
+          <path d="M89 172v49M291 172v49" stroke="#adb3a9" strokeWidth="12" />
+          <rect x="62" y="186" width="62" height="96" rx="28" fill="url(#ear)" />
           <rect x="103" y="192" width="21" height="84" rx="10" fill="#161d1a" />
           <rect x="257" y="186" width="62" height="96" rx="28" fill="url(#ear)" />
           <rect x="257" y="192" width="21" height="84" rx="10" fill="#161d1a" />
@@ -150,15 +150,15 @@ function Dialog({
   onClose,
   wide = false,
 }: {
-  title:    string;
+  title: string;
   children: React.ReactNode;
-  onClose:  () => void;
-  wide?:    boolean;
+  onClose: () => void;
+  wide?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const el       = ref.current;
+    const el = ref.current;
     const previous = document.activeElement as HTMLElement;
     el?.showModal();
     return () => {
@@ -171,9 +171,9 @@ function Dialog({
     if (e.target !== e.currentTarget) return;
     const r = e.currentTarget.getBoundingClientRect();
     if (
-      e.clientX < r.left  ||
+      e.clientX < r.left ||
       e.clientX > r.right ||
-      e.clientY < r.top   ||
+      e.clientY < r.top ||
       e.clientY > r.bottom
     ) onClose();
   }
@@ -203,44 +203,44 @@ function Dialog({
 export default function DrawStage() {
 
   // ── State ──────────────────────────────────────────────────────────────────
-  const [data,       setData]       = useState<Snapshot | null>(null);
+  const [data, setData] = useState<Snapshot | null>(null);
   const [connection, setConnection] = useState<ConnectionStatus>('connecting');
-  const [error,      setError]      = useState('');
-  const [notice,     setNotice]     = useState('');
-  const [modal,      setModal]      = useState<ModalType>(null);
-  const [code,       setCode]       = useState('');
-  const [busy,       setBusy]       = useState(false);
-  const [count,      setCount]      = useState(1);
-  const [sound,      setSound]      = useState(false);
-  const [quality,    setQuality]    = useState('balanced');
-  const [full,       setFull]       = useState(false);
-  const [pending,    setPending]    = useState<Intent | null>(null);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [modal, setModal] = useState<ModalType>(null);
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [count, setCount] = useState(1);
+  const [sound, setSound] = useState(false);
+  const [quality, setQuality] = useState('balanced');
+  const [full, setFull] = useState(false);
+  const [pending, setPending] = useState<Intent | null>(null);
   const [winnerPage, setWinnerPage] = useState(0);
 
   // ── Refs ───────────────────────────────────────────────────────────────────
-  const reduced       = useReducedMotion();
-  const dataRef       = useRef<Snapshot | null>(null);
-  const loading       = useRef(false);
-  const version       = useRef(0);
-  const clockOffset   = useRef(0);
-  const audioRef      = useRef<AudioContext | null>(null);
-  const heard         = useRef(new Set<string>());
-  const mounted       = useRef(true);
-  const queued        = useRef(false);
+  const reduced = useReducedMotion();
+  const dataRef = useRef<Snapshot | null>(null);
+  const loading = useRef(false);
+  const version = useRef(0);
+  const clockOffset = useRef(0);
+  const audioRef = useRef<AudioContext | null>(null);
+  const heard = useRef(new Set<string>());
+  const mounted = useRef(true);
+  const queued = useRef(false);
   const realtimeReady = useRef(false);
-  const failures      = useRef(0);
+  const failures = useRef(0);
 
   // ── Data fetching ──────────────────────────────────────────────────────────
 
   const refresh = useCallback(async () => {
-    if (!mounted.current)  return;
-    if (loading.current)   { queued.current = true; return; }
+    if (!mounted.current) return;
+    if (loading.current) { queued.current = true; return; }
     loading.current = true;
 
     try {
       const start = Date.now();
-      const r     = await fetch('/api/draw/state', {
-        cache:  'no-store',
+      const r = await fetch('/api/draw/state', {
+        cache: 'no-store',
         signal: AbortSignal.timeout(8_000),
       });
       const next = await r.json();
@@ -248,9 +248,9 @@ export default function DrawStage() {
       if (!mounted.current) return;
 
       if (next.version >= version.current) {
-        version.current     = next.version;
+        version.current = next.version;
         clockOffset.current = next.serverNow - (start + Date.now()) / 2;
-        dataRef.current     = next;
+        dataRef.current = next;
         setData(next);
       }
       failures.current = 0;
@@ -283,7 +283,7 @@ export default function DrawStage() {
         const p = JSON.parse(raw);
         if (
           typeof p.requestId === 'string' &&
-          typeof p.prizeId   === 'string' &&
+          typeof p.prizeId === 'string' &&
           Number.isInteger(p.count)
         ) {
           setPending(p);
@@ -292,7 +292,7 @@ export default function DrawStage() {
     } catch { /* storage unavailable */ }
 
     // Adaptive polling
-    let timer:   ReturnType<typeof setTimeout>;
+    let timer: ReturnType<typeof setTimeout>;
     let disposed = false;
 
     const tick = async () => {
@@ -306,18 +306,18 @@ export default function DrawStage() {
     };
     timer = setTimeout(tick, 1_800);
 
-    const wake       = () => void refresh();
+    const wake = () => void refresh();
     const fullscreen = () => setFull(!!document.fullscreenElement);
 
-    window.addEventListener('online',            wake);
+    window.addEventListener('online', wake);
     document.addEventListener('visibilitychange', wake);
     document.addEventListener('fullscreenchange', fullscreen);
 
     return () => {
-      disposed        = true;
+      disposed = true;
       mounted.current = false;
       clearTimeout(timer);
-      window.removeEventListener('online',            wake);
+      window.removeEventListener('online', wake);
       document.removeEventListener('visibilitychange', wake);
       document.removeEventListener('fullscreenchange', fullscreen);
     };
@@ -335,7 +335,7 @@ export default function DrawStage() {
   useEffect(() => {
     if (!data?.realtime) return;
     let disposed = false;
-    let cleanup  = () => { /* no-op until subscribed */ };
+    let cleanup = () => { /* no-op until subscribed */ };
 
     import('@supabase/supabase-js').then(({ createClient }) => {
       if (disposed) return;
@@ -343,7 +343,7 @@ export default function DrawStage() {
       const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
       if (!url || !key) return;
 
-      const client  = createClient(url, key, {
+      const client = createClient(url, key, {
         auth: { persistSession: false, autoRefreshToken: false },
       });
       const channel = client
@@ -351,9 +351,9 @@ export default function DrawStage() {
         .on(
           'postgres_changes',
           {
-            event:  '*',
+            event: '*',
             schema: 'public',
-            table:  'stage_signals',
+            table: 'stage_signals',
             filter: `event_id=eq.${process.env.NEXT_PUBLIC_REALTIME_EVENT || 'ictc-main'}`,
           },
           () => void refresh(),
@@ -390,9 +390,9 @@ export default function DrawStage() {
     try {
       const ctx = audioRef.current;
       [523.25, 659.25, 783.99].forEach((freq, i) => {
-        const osc  = ctx.createOscillator();
+        const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        const t    = ctx.currentTime + i * 0.1;
+        const t = ctx.currentTime + i * 0.1;
         osc.frequency.value = freq;
         gain.gain.setValueAtTime(0, t);
         gain.gain.linearRampToValueAtTime(0.035, t + 0.02);
@@ -447,7 +447,7 @@ export default function DrawStage() {
 
     const command = intent ?? {
       requestId: crypto.randomUUID(),
-      prizeId:   data.currentPrizeId,
+      prizeId: data.currentPrizeId,
       count,
     };
 
@@ -484,7 +484,7 @@ export default function DrawStage() {
     setBusy(true);
     setError('');
     try {
-      const r      = await fetch(`/api/draw/request?id=${encodeURIComponent(pending.requestId)}`, {
+      const r = await fetch(`/api/draw/request?id=${encodeURIComponent(pending.requestId)}`, {
         cache: 'no-store',
       });
       const result = await r.json();
@@ -535,18 +535,18 @@ export default function DrawStage() {
   }
 
   // ── Derived values ─────────────────────────────────────────────────────────
-  const prize       = data?.prizes.find(p => p.id === data.currentPrizeId);
-  const organizer   = !!data && data.role !== 'viewer';
-  const drawing     = data?.phase === 'drawing';
-  const revealed    = data?.phase === 'revealed' && !!data.active;
-  const active      = data?.active;
+  const prize = data?.prizes.find(p => p.id === data.currentPrizeId);
+  const organizer = !!data && data.role !== 'viewer';
+  const drawing = data?.phase === 'drawing';
+  const revealed = data?.phase === 'revealed' && !!data.active;
+  const active = data?.active;
   const disableDraw =
-    busy                              ||
-    connection !== 'online'           ||
-    drawing                           ||
-    !!pending                         ||
-    !prize                            ||
-    prize.remaining < count           ||
+    busy ||
+    connection !== 'online' ||
+    drawing ||
+    !!pending ||
+    !prize ||
+    prize.remaining < count ||
     (data?.eligibleCount ?? 0) < count;
   const winners = active?.winners.slice(winnerPage * 4, winnerPage * 4 + 4) ?? [];
 
@@ -569,9 +569,9 @@ export default function DrawStage() {
         <div className="top-actions">
           <span className={`connection ${connection}`}>
             <i />
-            {connection === 'online'  ? 'เชื่อมต่อแล้ว'
-           : connection === 'offline' ? 'กำลังเชื่อมต่อใหม่'
-           :                            'กำลังเชื่อมต่อ'}
+            {connection === 'online' ? 'เชื่อมต่อแล้ว'
+              : connection === 'offline' ? 'กำลังเชื่อมต่อใหม่'
+                : 'กำลังเชื่อมต่อ'}
           </span>
 
           {data?.demo && <span className="demo-label">โหมดสาธิต</span>}
@@ -624,9 +624,9 @@ export default function DrawStage() {
             <div className="stage-top">
               <span className="stage-status">
                 <span className="status-dot" />
-                {drawing  ? 'กำลังสุ่มผู้โชคดี'
-               : revealed ? 'ประกาศผู้โชคดี'
-               :            'รางวัลในรอบนี้'}
+                {drawing ? 'กำลังสุ่มผู้โชคดี'
+                  : revealed ? 'ประกาศผู้โชคดี'
+                    : 'รางวัลในรอบนี้'}
               </span>
               <span className="round-label">
                 {active
@@ -666,7 +666,7 @@ export default function DrawStage() {
                         <div>
                           <h3>{w.Name}</h3>
                           {w.Department && <p>{w.Department}</p>}
-                          {w.Job_role   && <small>{w.Job_role}</small>}
+                          {w.Job_role && <small>{w.Job_role}</small>}
                         </div>
                         <ShieldCheck size={22} />
                       </div>
@@ -691,9 +691,7 @@ export default function DrawStage() {
                     </div>
                   )}
 
-                  <span className="result-note">
-                    <Check size={14} /> ผลรางวัลจากระบบกลาง
-                  </span>
+
                 </motion.div>
               ) : (
                 // ── Prize preview ──
@@ -721,8 +719,8 @@ export default function DrawStage() {
                     </h2>
                     <p>
                       {drawing ? 'อีกสักครู่… ใครจะเป็นผู้โชคดี'
-                      : prize  ? `เหลือ ${prize.remaining} รางวัล · มาร่วมลุ้นไปด้วยกัน`
-                      :          'ผู้จัดสามารถเพิ่มรางวัลได้จากเมนูจัดการ'}
+                        : prize ? `เหลือ ${prize.remaining} รางวัล · มาร่วมลุ้นไปด้วยกัน`
+                          : 'ผู้จัดสามารถเพิ่มรางวัลได้จากเมนูจัดการ'}
                     </p>
                   </div>
                 </motion.div>
@@ -747,9 +745,9 @@ export default function DrawStage() {
                   <i
                     key={i}
                     style={{
-                      left:           `${i < 9 ? i * 3 : 76 + (i - 9) * 3}%`,
+                      left: `${i < 9 ? i * 3 : 76 + (i - 9) * 3}%`,
                       animationDelay: `${(i % 5) * 0.06}s`,
-                      transform:      `rotate(${i * 31}deg)`,
+                      transform: `rotate(${i * 31}deg)`,
                     }}
                   />
                 ))}
@@ -836,9 +834,9 @@ export default function DrawStage() {
               {!organizer && (
                 <div className="viewer-message">
                   <span className={drawing ? 'pulse-dot' : 'quiet-dot'} />
-                  {drawing  ? 'กำลังลุ้นไปพร้อมกัน…'
-                 : revealed ? 'ยินดีกับผู้โชคดีทุกท่าน'
-                 :            'รอผู้จัดเริ่มสุ่มรางวัล'}
+                  {drawing ? 'กำลังลุ้นไปพร้อมกัน…'
+                    : revealed ? 'ยินดีกับผู้โชคดีทุกท่าน'
+                      : 'รอผู้จัดเริ่มสุ่มรางวัล'}
                 </div>
               )}
             </div>
@@ -880,8 +878,8 @@ export default function DrawStage() {
                 key={p.id}
                 className={[
                   'lineup-item',
-                  p.id === data.currentPrizeId ? 'selected'  : '',
-                  p.remaining === 0            ? 'sold-out'  : '',
+                  p.id === data.currentPrizeId ? 'selected' : '',
+                  p.remaining === 0 ? 'sold-out' : '',
                 ].join(' ')}
                 disabled={!organizer || busy || drawing || !!pending}
                 onClick={() => { setCount(1); void action('prepare', { prizeId: p.id }); }}
@@ -1027,7 +1025,7 @@ export default function DrawStage() {
                   <div>
                     <small>
                       {new Date(r.createdAt).toLocaleTimeString('th-TH', {
-                        hour:   '2-digit',
+                        hour: '2-digit',
                         minute: '2-digit',
                       })}{' '}
                       · {r.winners.length} คน
@@ -1082,41 +1080,41 @@ export default function DrawStage() {
 // ─── Manager component ────────────────────────────────────────────────────────
 
 type ManagerProps = {
-  data:       Snapshot;
-  busy:       boolean;
-  action:     (name: string, body: unknown) => Promise<boolean>;
-  quality:    string;
+  data: Snapshot;
+  busy: boolean;
+  action: (name: string, body: unknown) => Promise<boolean>;
+  quality: string;
   setQuality: (q: string) => void;
 };
 
 type PrizeFormState = {
-  id:       string;
-  name:     string;
-  total:    number;
-  kind:     Prize['kind'];
+  id: string;
+  name: string;
+  total: number;
+  kind: Prize['kind'];
   imageUrl: string;
 };
 
 /** แผงจัดการสำหรับผู้จัด — tabs: ตั้งค่า / รายชื่อ / รางวัล / ประวัติ */
 function Manager({ data, busy, action, quality, setQuality }: ManagerProps) {
-  const [tab,      setTab]      = useState('general');
+  const [tab, setTab] = useState('general');
   const [settings, setSettings] = useState<Settings>(data.settings);
-  const [csv,      setCsv]      = useState('');
+  const [csv, setCsv] = useState('');
   const [csvError, setCsvError] = useState('');
   const [csvCount, setCsvCount] = useState(0);
-  const [saved,    setSaved]    = useState('');
+  const [saved, setSaved] = useState('');
 
   const [prize, setPrize] = useState<PrizeFormState>({
-    id:       crypto.randomUUID(),
-    name:     '',
-    total:    1,
-    kind:     'gift',
+    id: crypto.randomUUID(),
+    name: '',
+    total: 1,
+    kind: 'gift',
     imageUrl: '',
   });
 
-  const [cancelId,           setCancelId]           = useState('');
-  const [reason,             setReason]             = useState('');
-  const [returnEligibility,  setReturnEligibility]  = useState(false);
+  const [cancelId, setCancelId] = useState('');
+  const [reason, setReason] = useState('');
+  const [returnEligibility, setReturnEligibility] = useState(false);
 
   /** ตรวจสอบ CSV และ update count/error */
   function preview(text: string) {
@@ -1139,16 +1137,16 @@ function Manager({ data, busy, action, quality, setQuality }: ManagerProps) {
 
   const tabs: [id: string, label: string][] = [
     ['general', 'ตั้งค่า'],
-    ['people',  'รายชื่อ'],
-    ['prizes',  'รางวัล'],
+    ['people', 'รายชื่อ'],
+    ['prizes', 'รางวัล'],
     ['records', 'ประวัติ / สำรอง'],
   ];
 
   const toggleFields: [key: keyof Settings, label: string][] = [
     ['showDepartment', 'แสดงหน่วยงาน'],
-    ['showRole',       'แสดงตำแหน่งงาน'],
-    ['maskNames',      'ปิดบังชื่อบางส่วน'],
-    ['allowRepeat',    'รับรางวัลซ้ำข้ามรอบได้'],
+    ['showRole', 'แสดงตำแหน่งงาน'],
+    ['maskNames', 'ปิดบังชื่อบางส่วน'],
+    ['allowRepeat', 'รับรางวัลซ้ำข้ามรอบได้'],
   ];
 
   return (
